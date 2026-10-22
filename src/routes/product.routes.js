@@ -1,0 +1,16 @@
+import { Router } from 'express';
+import * as products from '../controllers/product.controller.js';
+import { authenticate, authorize } from '../middlewares/auth.js';
+import { validate } from '../middlewares/validate.js';
+import { idParamSchema, productQuerySchema, productSchema } from '../validators/product.validators.js';
+
+const router = Router();
+const adminOnly = [authenticate, authorize('admin')];
+
+router.get('/', validate(productQuerySchema, 'query'), products.list);
+router.get('/:id', validate(idParamSchema, 'params'), products.getById);
+router.post('/', adminOnly, validate(productSchema), products.create);
+router.put('/:id', adminOnly, validate(idParamSchema, 'params'), validate(productSchema), products.update);
+router.delete('/:id', adminOnly, validate(idParamSchema, 'params'), products.remove);
+
+export default router;
