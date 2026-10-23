@@ -4,7 +4,7 @@ API REST de la tienda de productos tecnológicos **TechStore**, desarrollada par
 
 **Stack:** Node.js · Express 5 · SQLite (`node:sqlite`) · JWT · bcrypt · Zod
 
-Frontend: repositorio `techstore-web`.
+Frontend: repositorio [`evaluacion-turingIA-frontend`](https://github.com/devsamuelgomez-glitch/evaluacion-turingIA-frontend).
 
 ## Requisitos
 
@@ -63,6 +63,11 @@ Base URL: `http://localhost:4000/api`. La colección de Postman está en [`docs/
 | `DELETE` | `/products/:id` | Admin | Eliminar producto |
 | `GET` | `/categories` | Público | Categorías con conteo de productos |
 | `GET` | `/brands` | Público | Marcas con conteo de productos |
+| `GET` | `/reviews?limit=3` | Público | Últimas reseñas (usuario, producto e imagen) |
+| `GET` | `/products/:id/reviews` | Público | Reseñas de un producto |
+| `POST` | `/products/:id/reviews` | Autenticado | Crear reseña (`rating` 1–5, `comment`); una por usuario y producto |
+| `DELETE` | `/reviews/:id` | Autor o admin | Eliminar reseña |
+| `GET` | `/images` | Admin | Imágenes locales disponibles para los productos |
 
 **Query params de `GET /products`:** `category` (slug), `brand` (id), `search`, `sort` (`newest` · `price_asc` · `price_desc` · `name`), `page` (≥1), `limit` (1–50, default 6).
 
@@ -87,6 +92,7 @@ Las fotos provienen del catálogo demo de [DummyJSON](https://dummyjson.com/docs
 | 403 | Rol sin permisos (un `user` intentando modificar productos) |
 | 404 | Recurso o ruta inexistente |
 | 409 | Correo ya registrado |
+| 409 | Reseña duplicada (el usuario ya reseñó ese producto) |
 | 429 | Demasiados intentos de login/registro |
 
 ## Arquitectura

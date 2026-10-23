@@ -8,7 +8,8 @@
     { "key": "baseUrl", "value": "http://localhost:4000/api" },
     { "key": "adminToken", "value": "" },
     { "key": "userToken", "value": "" },
-    { "key": "productId", "value": "1" }
+    { "key": "productId", "value": "1" },
+    { "key": "reviewId", "value": "" }
   ],
   "item": [
     {
@@ -141,9 +142,46 @@
     {
       "name": "Catalog",
       "item": [
-        { "name": "Categories", "request": { "method": "GET", "url": "{{baseUrl}}/categories", "description": "Público. Incluye `product_count`." } },
+        { "name": "Categories", "request": { "method": "GET", "url": "{{baseUrl}}/categories", "description": "Público. Incluye `product_count` y `cover_image`." } },
         { "name": "Brands", "request": { "method": "GET", "url": "{{baseUrl}}/brands", "description": "Público. Incluye `product_count`." } },
+        { "name": "Product images (admin)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/images", "description": "Solo admin. Imágenes locales disponibles (`path` para guardar en `image_url`, `url` para mostrarla). Respuestas: 200, 401, 403." } },
         { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/health" } }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Latest reviews",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reviews?limit=3", "description": "Público. Últimas reseñas con `user`, `product` (incluye `image_url`), `rating` y `comment`. `limit` de 1 a 20." }
+        },
+        {
+          "name": "Reviews of a product",
+          "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}/reviews", "description": "Público. Respuestas: 200, 404." }
+        },
+        {
+          "name": "Create review (user)",
+          "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) pm.collectionVariables.set('reviewId', pm.response.json().id);"] } }],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{userToken}}" }
+            ],
+            "url": "{{baseUrl}}/products/{{productId}}/reviews",
+            "body": { "mode": "raw", "raw": "{\n  \"rating\": 5,\n  \"comment\": \"Excelente producto, llegó rápido.\"\n}" },
+            "description": "Usuario autenticado. Una reseña por usuario y producto. Respuestas: 201, 400, 401, 404, 409 (duplicada)."
+          }
+        },
+        {
+          "name": "Delete review (author or admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
+            "url": "{{baseUrl}}/reviews/{{reviewId}}",
+            "description": "Solo el autor de la reseña o un admin. Respuestas: 204, 401, 403, 404."
+          }
+        }
       ]
     }
   ]
