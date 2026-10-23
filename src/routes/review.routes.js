@@ -7,7 +7,7 @@ import { reviewQuerySchema } from '../validators/review.validators.js';
 
 const router = Router();
 
-router.get('/', validate(reviewQuerySchema, 'query'), reviews.latest);
+router.get('/', authenticate, validate(reviewQuerySchema, 'query'), reviews.latest);
 router.delete('/:id', authenticate, validate(idParamSchema, 'params'), reviews.remove);
 
 export default router;

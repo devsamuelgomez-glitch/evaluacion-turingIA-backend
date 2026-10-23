@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "TechStore API",
-    "description": "Colección de endpoints de TechStore. Ejecuta primero **Auth > Login admin**: guarda el token en la variable `adminToken` automáticamente.",
+    "description": "Colección de endpoints de TechStore. Toda la API requiere token excepto **Health**, **Register** y **Login**. Ejecuta primero **Auth > Login admin** y **Auth > Login user**: guardan los tokens en `adminToken` y `userToken` automáticamente.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -64,6 +64,7 @@
           "name": "List products",
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
             "url": {
               "raw": "{{baseUrl}}/products?category=audio&page=1&limit=6&sort=price_asc",
               "host": ["{{baseUrl}}"],
@@ -77,15 +78,16 @@
                 { "key": "sort", "value": "price_asc", "description": "newest | price_asc | price_desc | name" }
               ]
             },
-            "description": "Público. Devuelve `{ data: Product[], pagination: { page, limit, total, totalPages } }`."
+            "description": "Autenticado (cualquier rol). Devuelve `{ data: Product[], pagination: { page, limit, total, totalPages } }`."
           }
         },
         {
           "name": "Get product",
           "request": {
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }],
             "url": "{{baseUrl}}/products/{{productId}}",
-            "description": "Público. Respuestas: 200, 400 (id inválido), 404."
+            "description": "Autenticado. Respuestas: 200, 400 (id inválido), 401, 404."
           }
         },
         {
@@ -142,8 +144,8 @@
     {
       "name": "Catalog",
       "item": [
-        { "name": "Categories", "request": { "method": "GET", "url": "{{baseUrl}}/categories", "description": "Público. Incluye `product_count` y `cover_image`." } },
-        { "name": "Brands", "request": { "method": "GET", "url": "{{baseUrl}}/brands", "description": "Público. Incluye `product_count`." } },
+        { "name": "Categories", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/categories", "description": "Autenticado. Incluye `product_count` y `cover_image`." } },
+        { "name": "Brands", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/brands", "description": "Autenticado. Incluye `product_count`." } },
         { "name": "Product images (admin)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/images", "description": "Solo admin. Imágenes locales disponibles (`path` para guardar en `image_url`, `url` para mostrarla). Respuestas: 200, 401, 403." } },
         { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/health" } }
       ]
@@ -153,11 +155,11 @@
       "item": [
         {
           "name": "Latest reviews",
-          "request": { "method": "GET", "url": "{{baseUrl}}/reviews?limit=3", "description": "Público. Últimas reseñas con `user`, `product` (incluye `image_url`), `rating` y `comment`. `limit` de 1 a 20." }
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/reviews?limit=3", "description": "Autenticado. Últimas reseñas con `user`, `product` (incluye `image_url`), `rating` y `comment`. `limit` de 1 a 20." }
         },
         {
           "name": "Reviews of a product",
-          "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}/reviews", "description": "Público. Respuestas: 200, 404." }
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{userToken}}" }], "url": "{{baseUrl}}/products/{{productId}}/reviews", "description": "Autenticado. Respuestas: 200, 401, 404." }
         },
         {
           "name": "Create review (user)",

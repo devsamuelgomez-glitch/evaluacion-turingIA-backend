@@ -8,11 +8,12 @@ import { authenticate, authorize } from '../middlewares/auth.js';
 
 const router = Router();
 
+// Everything except health and login/register requires a valid token
 router.get('/health', (_req, res) => res.json({ status: 'ok' }));
 router.use('/auth', authRoutes);
 router.use('/products', productRoutes);
-router.get('/categories', catalog.categories);
-router.get('/brands', catalog.brands);
+router.get('/categories', authenticate, catalog.categories);
+router.get('/brands', authenticate, catalog.brands);
 router.use('/reviews', reviewRoutes);
 router.get('/images', authenticate, authorize('admin'), images.list);
 

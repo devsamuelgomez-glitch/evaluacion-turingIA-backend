@@ -56,22 +56,22 @@ Base URL: `http://localhost:4000/api`. La colección de Postman está en [`docs/
 | `POST` | `/auth/register` | Público | Registro (rol `user`) |
 | `POST` | `/auth/login` | Público | Login, devuelve `{ user, token }` |
 | `GET` | `/auth/me` | Autenticado | Perfil del usuario actual |
-| `GET` | `/products` | Público | Lista paginada con filtros |
-| `GET` | `/products/:id` | Público | Detalle de producto |
+| `GET` | `/products` | Autenticado | Lista paginada con filtros |
+| `GET` | `/products/:id` | Autenticado | Detalle de producto |
 | `POST` | `/products` | Admin | Crear producto |
 | `PUT` | `/products/:id` | Admin | Actualizar producto |
 | `DELETE` | `/products/:id` | Admin | Eliminar producto |
-| `GET` | `/categories` | Público | Categorías con conteo de productos |
-| `GET` | `/brands` | Público | Marcas con conteo de productos |
-| `GET` | `/reviews?limit=3` | Público | Últimas reseñas (usuario, producto e imagen) |
-| `GET` | `/products/:id/reviews` | Público | Reseñas de un producto |
+| `GET` | `/categories` | Autenticado | Categorías con conteo de productos |
+| `GET` | `/brands` | Autenticado | Marcas con conteo de productos |
+| `GET` | `/reviews?limit=3` | Autenticado | Últimas reseñas (usuario, producto e imagen) |
+| `GET` | `/products/:id/reviews` | Autenticado | Reseñas de un producto |
 | `POST` | `/products/:id/reviews` | Autenticado | Crear reseña (`rating` 1–5, `comment`); una por usuario y producto |
 | `DELETE` | `/reviews/:id` | Autor o admin | Eliminar reseña |
 | `GET` | `/images` | Admin | Imágenes locales disponibles para los productos |
 
 **Query params de `GET /products`:** `category` (slug), `brand` (id), `search`, `sort` (`newest` · `price_asc` · `price_desc` · `name`), `page` (≥1), `limit` (1–50, default 6).
 
-Las rutas protegidas requieren el header `Authorization: Bearer <token>`.
+**Toda la API requiere sesión** excepto `/health`, `/auth/register` y `/auth/login`: el resto de las rutas exige el header `Authorization: Bearer <token>` (401 sin token o con token inválido/expirado) y las de administración además el rol `admin` (403). Las imágenes estáticas (`/images/...`) son públicas porque una etiqueta `<img>` no puede enviar el header.
 
 ### Imágenes
 
@@ -117,7 +117,7 @@ Cada capa tiene una sola responsabilidad: las rutas solo conectan middlewares, l
 
 - Contraseñas hasheadas con **bcrypt** (10 rondas). Nunca se devuelven en las respuestas.
 - **JWT** firmado con secreto de entorno y expiración configurable.
-- Control de acceso por rol con el middleware `authorize('admin')`.
+- **Autenticación obligatoria** en todos los endpoints de datos (`authenticate`) y control de acceso por rol con `authorize('admin')`.
 - **Validación** de body, params y query con Zod antes de llegar al controlador.
 - **Consultas parametrizadas** en todo el código (sin concatenar entradas del usuario en el SQL).
 - **helmet** para cabeceras HTTP seguras, **CORS** restringido al origen del frontend.
