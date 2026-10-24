@@ -1,0 +1,23 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Creates the API as a free web service. The SQLite database is created by the seed during the build,
+# so every deploy (and every restart of the free instance) starts from the demo data.
+services:
+  - type: web
+    name: techstore-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev && npm run seed
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "24"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 2h
+      # URL of the frontend on Vercel, e.g. https://techstore.vercel.app (comma-separated if several)
+      - key: CORS_ORIGIN
+        sync: false

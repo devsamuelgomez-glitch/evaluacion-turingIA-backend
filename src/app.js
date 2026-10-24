@@ -13,6 +13,9 @@ const publicImagesDir = resolve(dirname(fileURLToPath(import.meta.url)), '../pub
 const app = express();
 
 app.disable('x-powered-by');
+// Behind the hosting provider's proxy (Render), trust its X-Forwarded-For so the rate limiter
+// sees each client's real IP instead of counting everyone as the proxy
+if (env.nodeEnv === 'production') app.set('trust proxy', 1);
 // cross-origin resource policy so the frontend (another origin) can display /images
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 const allowedOrigins = env.corsOrigin.split(',').map((o) => o.trim());

@@ -8,7 +8,7 @@ Frontend: repositorio [`evaluacion-turingIA-frontend`](https://github.com/devsam
 
 ## Requisitos
 
-- **Node.js 22.5 o superior** (se usa el módulo nativo `node:sqlite`, así que no hay que instalar ningún servidor de base de datos)
+- **Node.js 22.13 o superior** (se usa el módulo nativo `node:sqlite`, disponible sin flags desde esa versión; no hay que instalar ningún servidor de base de datos)
 - npm 10+
 
 ## Instalación y ejecución
@@ -153,3 +153,16 @@ Cada capa tiene una sola responsabilidad: las rutas solo conectan middlewares, l
 ## Base de datos
 
 6 tablas normalizadas a 3FN: `roles`, `users`, `categories`, `brands`, `products`, `reviews`. El diagrama entidad-relación y la justificación de la normalización están en [`docs/er-diagram.md`](docs/er-diagram.md).
+
+## Despliegue (Render)
+
+La API está lista para desplegarse en [Render](https://render.com) con el blueprint [`render.yaml`](render.yaml):
+
+1. En Render: **New → Blueprint** y conecta este repositorio.
+2. Cuando lo pida, define `CORS_ORIGIN` con la URL del frontend (por ejemplo `https://techstore.vercel.app`).
+3. Render instala dependencias, crea la base de datos con el seed (`npm run seed`) y arranca con `npm start`. `JWT_SECRET` se genera automáticamente y `PUBLIC_URL` se toma de la URL que asigna Render (`RENDER_EXTERNAL_URL`).
+
+Notas del plan gratuito:
+- La instancia se apaga tras ~15 min sin uso; la primera petición después puede tardar hasta un minuto (el frontend muestra un aviso).
+- El disco es efímero: al reiniciarse, la base de datos vuelve a los datos del seed. Para una demo es una ventaja (siempre arranca limpia); en producción real se usaría un disco persistente o una base de datos administrada.
+- En producción, Express confía en el proxy de Render (`trust proxy`) para que el rate limiting use la IP real de cada cliente, y CORS solo acepta el origen configurado.
