@@ -6,6 +6,8 @@ API REST de la tienda de productos tecnológicos **TechStore**, desarrollada par
 
 Frontend: repositorio [`evaluacion-turingIA-frontend`](https://github.com/devsamuelgomez-glitch/evaluacion-turingIA-frontend).
 
+**En vivo:** API en <https://techstore-api-1xqd.onrender.com/api/health> · sitio en <https://evaluacion-turing-ia-frontend.vercel.app> (cuentas de prueba abajo). En el plan gratuito de Render, la primera petición después de un rato sin uso puede tardar hasta un minuto.
+
 ## Requisitos
 
 - **Node.js 22.13 o superior** (se usa el módulo nativo `node:sqlite`, disponible sin flags desde esa versión; no hay que instalar ningún servidor de base de datos)
