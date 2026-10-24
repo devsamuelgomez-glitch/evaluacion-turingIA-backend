@@ -26,6 +26,27 @@ npm run dev                 # http://localhost:4000/api
 | `npm run dev` | Servidor con recarga automática (nodemon) |
 | `npm start` | Servidor en modo producción |
 | `npm run seed` | Reinicia la base de datos con datos de ejemplo |
+| `npm test` | Pruebas unitarias y de integración |
+| `npm run test:coverage` | Pruebas con reporte de cobertura |
+
+## Pruebas
+
+```bash
+npm test
+```
+
+67 pruebas con el runner nativo de Node (`node:test`) y [supertest](https://github.com/ladjs/supertest). No hace falta tener el servidor corriendo ni un `.env`: cada archivo de pruebas crea su propia base de datos temporal con los datos del seed y la borra al terminar. Cobertura: ~99 % de líneas.
+
+| Archivo | Qué cubre |
+|---|---|
+| `test/unit/validators.test.js` | Esquemas Zod: reglas de contraseña, normalización de correo, rutas de imagen seguras, `sort` solo con valores permitidos |
+| `test/unit/middlewares.test.js` | `authenticate` (token válido, vencido, falsificado), `authorize`, `validate`, `toPublicUrl` |
+| `test/api/auth.test.js` | Login, registro (siempre rol `user`), 409 por correo duplicado, `/auth/me` |
+| `test/api/products.test.js` | Listado con filtros, búsqueda, orden y paginación; CRUD completo como admin; 400/401/403/404 |
+| `test/api/reviews.test.js` | Crear, listar y borrar reseñas; 409 por duplicada, permisos de autor/admin, borrado en cascada |
+| `test/api/security.test.js` | 401 en todos los endpoints de datos, tokens falsificados, helmet, CORS, JSON mal formado, límite de 100 kB, rate limiting (429) |
+
+Las pruebas encontraron y ayudaron a corregir dos bugs: un correo con espacios (`" user@techstore.com "`) se rechazaba porque se validaba antes de recortarlo, y un body de más de 100 kB respondía 500 en lugar de 413.
 
 ### Variables de entorno
 
@@ -93,6 +114,7 @@ Las fotos provienen del catálogo demo de [DummyJSON](https://dummyjson.com/docs
 | 404 | Recurso o ruta inexistente |
 | 409 | Correo ya registrado |
 | 409 | Reseña duplicada (el usuario ya reseñó ese producto) |
+| 413 | Body JSON de más de 100 kB |
 | 429 | Demasiados intentos de login/registro |
 
 ## Arquitectura
@@ -109,6 +131,9 @@ src/
 ├── utils/         # HttpError
 ├── app.js         # Configuración de Express
 └── server.js      # Punto de entrada
+test/
+├── unit/          # Validadores y middlewares aislados
+└── api/           # Endpoints de punta a punta con supertest
 ```
 
 Cada capa tiene una sola responsabilidad: las rutas solo conectan middlewares, los controladores no conocen SQL y los servicios no conocen `req`/`res`.
