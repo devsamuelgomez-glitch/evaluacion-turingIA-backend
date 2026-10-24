@@ -9,5 +9,6 @@ process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-secret-only-for-automated-tests';
 process.env.JWT_EXPIRES_IN = '1h';
 process.env.PUBLIC_URL = 'http://api.test';
-process.env.CORS_ORIGIN = 'http://front.test';
+// Trailing slash on purpose: the app must normalize it
+process.env.CORS_ORIGIN = 'http://front.test/';
 process.env.DB_PATH = dbPath;

@@ -18,7 +18,8 @@ app.disable('x-powered-by');
 if (env.nodeEnv === 'production') app.set('trust proxy', 1);
 // cross-origin resource policy so the frontend (another origin) can display /images
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
-const allowedOrigins = env.corsOrigin.split(',').map((o) => o.trim());
+// Browsers send the Origin without a trailing slash, so "https://site.app/" in the config must still match
+const allowedOrigins = env.corsOrigin.split(',').map((o) => o.trim().replace(/\/+$/, ''));
 // In development any localhost port is accepted, so Vite picking another port doesn't break the app
 const isDevLocalhost = (origin) => env.nodeEnv === 'development' && /^http:\/\/localhost:\d+$/.test(origin);
 
